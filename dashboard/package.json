@@ -1,0 +1,25 @@
+{
+  "name": "market-research-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "^15.1",
+    "react": "^19.0",
+    "react-dom": "^19.0",
+    "@supabase/supabase-js": "^2.47",
+    "react-markdown": "^9.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "typescript": "^5.7",
+    "tailwindcss": "^4.0",
+    "@tailwindcss/postcss": "^4.0",
+    "postcss": "^8.5"
+  }
+}

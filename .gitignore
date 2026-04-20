@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Environment
+.env
+
+# Downloads
+downloads/
+
+# Node (dashboard)
+dashboard/node_modules/
+dashboard/.next/
+
+# OS
+.DS_Store
