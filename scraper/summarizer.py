@@ -72,7 +72,7 @@ def summarize_article(
     try:
         client = _get_client()
         response = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-sonnet-4-6",
             max_tokens=1500,
             system=SYSTEM_PROMPT,
             messages=[{"role": "user", "content": user_message}],
@@ -114,7 +114,7 @@ def summarize_batch_digest(summaries: list[dict]) -> str:
     try:
         client = _get_client()
         response = client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-sonnet-4-6",
             max_tokens=2000,
             system=(
                 "You are a senior portfolio strategist synthesizing research "
