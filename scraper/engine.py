@@ -36,8 +36,7 @@ class ScrapedArticle:
 
 async def _extract_article_links(page: Page, firm: FirmConfig) -> list[str]:
     """From a firm's listing page, extract all article URLs."""
-    await page.goto(firm.research_url, wait_until="networkidle", timeout=30000)
-    # Wait a bit for JS-rendered content
+    await page.goto(firm.research_url, wait_until="domcontentloaded", timeout=30000)
     await page.wait_for_timeout(2000)
 
     elements = await page.query_selector_all(firm.link_selector)
@@ -50,6 +49,8 @@ async def _extract_article_links(page: Page, firm: FirmConfig) -> list[str]:
         full_url = urljoin(firm.research_url, href)
         if firm.link_filter and not re.search(firm.link_filter, full_url):
             continue
+        if _looks_like_listing_page(full_url, firm.research_url):
+            continue
         if full_url not in urls:
             urls.append(full_url)
 
@@ -57,10 +58,53 @@ async def _extract_article_links(page: Page, firm: FirmConfig) -> list[str]:
     return urls
 
 
+_LISTING_PATH_HINTS = (
+    "/category/",
+    "/categories/",
+    "/series/",
+    "/topic/",
+    "/topics/",
+    "/tag/",
+    "/tags/",
+    "/author/",
+    "/page/",
+)
+
+_LISTING_SLUG_HINTS = {
+    "in-the-media",
+    "policy-positions",
+    "press-releases",
+    "research",
+    "insights",
+    "news",
+    "newsroom",
+    "blog",
+    "media",
+    "podcasts",
+    "videos",
+    "events",
+    "all",
+    "latest",
+}
+
+
+def _looks_like_listing_page(url: str, listing_url: str) -> bool:
+    """Heuristic: skip URLs that look like category/series/tag listing pages."""
+    if url.rstrip("/") == listing_url.rstrip("/"):
+        return True
+    path = url.split("?", 1)[0].split("#", 1)[0]
+    if any(hint in path for hint in _LISTING_PATH_HINTS):
+        return True
+    last_segment = path.rstrip("/").rsplit("/", 1)[-1]
+    if last_segment in _LISTING_SLUG_HINTS:
+        return True
+    return False
+
+
 async def _scrape_article(page: Page, firm: FirmConfig, url: str) -> ScrapedArticle | None:
     """Scrape a single article page for content and PDFs."""
     try:
-        await page.goto(url, wait_until="networkidle", timeout=30000)
+        await page.goto(url, wait_until="domcontentloaded", timeout=30000)
         await page.wait_for_timeout(1500)
     except Exception as e:
         logger.warning(f"[{firm.slug}] Failed to load {url}: {e}")
